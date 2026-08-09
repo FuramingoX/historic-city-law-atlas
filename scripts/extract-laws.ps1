@@ -13,6 +13,8 @@ function Normalize-Text([string]$Text) {
   $value = $value -replace "`v", "`n"
   $value = $value -replace "`f", "`n"
   $value = $value -replace "[\u0000-\u0008\u000B\u000C\u000E-\u001F]", ""
+  $value = [regex]::Replace($value, '(?s)\n\s*\u65e0\u76f8\u5173\u5185\u5bb9\s*\n.*$', '')
+  $value = [regex]::Replace($value, '(?s)\n\s*\*?\u6ce8\uff1a\u672c\u6587\u683c\u5f0f\u9075\u5faa.*$', '')
   $lines = $value -split "`n" | ForEach-Object { ($_ -replace "[\s\u3000]+$", "").TrimStart() }
   return (($lines -join "`n") -replace "`n{3,}", "`n`n").Trim()
 }
