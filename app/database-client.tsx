@@ -19,6 +19,10 @@ type Law = {
   codedIndicators: number;
   meanStrength: number;
   evidenceCount: number;
+  chapters: {
+    title: string;
+    articles: { ordinal: number; label: string; content: string }[];
+  }[];
 };
 
 type IndicatorStat = { code: string; presentCount: number; strongCount: number; evidenceCount: number };
@@ -93,7 +97,7 @@ export function DatabaseClient({ laws, indicators, indicatorStats, processingSum
             <section className="hero-panel">
               <div>
                 <span className="section-kicker">从文件堆栈到可验证的制度数据</span>
-                <h2>让每一个编码结论，<br />都能回到一条法规原文。</h2>
+                <h2>让每一个结论，<br />都能回到一条法规原文。</h2>
                 <p>当前已收录北大法宝目录中的全部文件元数据。正文、条文和制度强度将在完成批量读取后进入证据审查流程。</p>
                 <div className="hero-actions">
                   <button className="primary" onClick={() => setView("laws")}>浏览法规目录</button>
@@ -167,7 +171,7 @@ export function DatabaseClient({ laws, indicators, indicatorStats, processingSum
         )}
       </section>
 
-      {selectedLaw && <div className="modal-backdrop" onMouseDown={() => setSelectedLaw(null)}><section className="drawer" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="法规详情"><button className="close" onClick={() => setSelectedLaw(null)} aria-label="关闭">×</button><span className="eyebrow">LAW RECORD · {selectedLaw.id}</span><h2>{selectedLaw.title}</h2><div className="detail-grid"><div><span>地域</span><strong>{selectedLaw.jurisdiction}</strong></div><div><span>文件类型</span><strong>{selectedLaw.documentType === "amendment" ? "修改决定" : "保护条例"}</strong></div><div><span>条文数量</span><strong>{selectedLaw.articleCount}</strong></div><div><span>加工状态</span><strong>{statusLabel[selectedLaw.extractionStatus] ?? "待处理"}</strong></div><div><span>检出指标</span><strong>{selectedLaw.codedIndicators} / 14</strong></div><div><span>证据回链</span><strong>{selectedLaw.evidenceCount} 条</strong></div></div><h3>来源文件</h3><p className="source-path">北大法宝 / {selectedLaw.sourceFile}</p><div className="notice"><strong>证据状态</strong><p>正文与条文已结构化，制度强度均为关键词证据法生成的机器初编，必须经研究者逐条复核后才能作为正式数据使用。</p></div><button className="primary wide" onClick={() => setSelectedLaw(null)}>返回目录</button></section></div>}
+      {selectedLaw && <div className="modal-backdrop" onMouseDown={() => setSelectedLaw(null)}><section className="drawer law-drawer" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="法规全文"><button className="close" onClick={() => setSelectedLaw(null)} aria-label="关闭">×</button><span className="eyebrow">LAW RECORD · {selectedLaw.id}</span><h2>{selectedLaw.title}</h2><div className="detail-grid"><div><span>地域</span><strong>{selectedLaw.jurisdiction}</strong></div><div><span>文件类型</span><strong>{selectedLaw.documentType === "amendment" ? "修改决定" : "保护条例"}</strong></div><div><span>条文数量</span><strong>{selectedLaw.articleCount}</strong></div><div><span>加工状态</span><strong>{statusLabel[selectedLaw.extractionStatus] ?? "待处理"}</strong></div><div><span>检出指标</span><strong>{selectedLaw.codedIndicators} / 14</strong></div><div><span>证据回链</span><strong>{selectedLaw.evidenceCount} 条</strong></div></div><div className="fulltext-head"><div><span className="eyebrow">FULL TEXT</span><h3>法规全文</h3></div><span>共 {selectedLaw.articleCount} 条</span></div><nav className="chapter-index" aria-label="章节目录">{selectedLaw.chapters.map((chapter, index) => <a key={`${chapter.title}-${index}`} href={`#law-${selectedLaw.id}-chapter-${index}`}>{chapter.title}<small>{chapter.articles.length} 条</small></a>)}</nav><div className="law-fulltext">{selectedLaw.chapters.map((chapter, index) => <section key={`${chapter.title}-${index}`} id={`law-${selectedLaw.id}-chapter-${index}`} className="law-chapter"><h3>{chapter.title}</h3>{chapter.articles.map((article) => <article key={article.ordinal} className="law-article"><strong>{article.label}</strong><div>{article.content.split("\n").filter(Boolean).map((paragraph, paragraphIndex) => <p key={paragraphIndex}>{paragraph}</p>)}</div></article>)}</section>)}</div><h3>来源文件</h3><p className="source-path">北大法宝 / {selectedLaw.sourceFile}</p><div className="notice"><strong>文本说明</strong><p>本页展示数据库从来源文件中结构化提取的全部条文。研究引用前请与正式公布文本复核。</p></div><button className="primary wide" onClick={() => setSelectedLaw(null)}>返回目录</button></section></div>}
 
       {selectedIndicator && <div className="modal-backdrop" onMouseDown={() => setSelectedIndicator(null)}><section className="drawer indicator-drawer" onMouseDown={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="指标编码标准"><button className="close" onClick={() => setSelectedIndicator(null)} aria-label="关闭">×</button><span className="eyebrow">{selectedIndicator.category} · {selectedIndicator.code}</span><h2>{selectedIndicator.name}</h2><p className="definition">{selectedIndicator.definition}</p><h3>0—3级判定量表</h3><ol className="rubric">{selectedIndicator.rubric.map((item, index) => <li key={item}><i>{index}</i><div><strong>{index === 0 ? "未建立" : index === 1 ? "原则规定" : index === 2 ? "程序明确" : "机制完整"}</strong><span>{item}</span></div></li>)}</ol><div className="notice"><strong>编码要求</strong><p>至少保存一条直接相关的法规原文；若多个条文共同构成制度，分别保存并说明其关系。</p></div></section></div>}
     </main>
