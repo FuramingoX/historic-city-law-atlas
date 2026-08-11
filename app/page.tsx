@@ -3,6 +3,7 @@ import codingData from "@/data/codings.raw.json";
 import { indicators } from "@/data/indicators";
 import { DatabaseClient } from "./database-client";
 
+
 export const metadata = {
   title: "城保法研｜法规数据库",
   description: "59份历史文化名城保护法规的结构化检索、比较与证据审查平台。",
